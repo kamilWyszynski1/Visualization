@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
@@ -15,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.fragment.findNavController
 import kotlin.math.min
@@ -31,9 +33,46 @@ class FirstFragment : Fragment() {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_first, container, false)
         val cl = root.findViewById<ConstraintLayout>(R.id.cl)
-        val bt = Button(context)
-        bt.text = "elo"
-        cl.addView(bt)
+
+        val VERTICAL_GAP = 100
+        val HORIZONTAL_GAP = 200
+
+        val height = Resources.getSystem().displayMetrics.heightPixels
+        val width = Resources.getSystem().displayMetrics.widthPixels
+
+        println("$height $width")
+        ///
+        val HORIZONTAL_SIZE = 8
+        val VERTIVAL_SIZE = 8
+
+        val left = VERTICAL_GAP
+        val top = 0
+        val gap = 1
+        val size = min(
+            (height - 2 * HORIZONTAL_GAP - HORIZONTAL_SIZE * gap) / HORIZONTAL_SIZE,
+            (width - 2 * VERTICAL_GAP - VERTIVAL_SIZE * gap) / VERTIVAL_SIZE
+        )
+
+        println("size: $size")
+
+        val paint = Paint()
+        paint.color = Color.RED
+
+        for (i in 0 until HORIZONTAL_SIZE) {
+            for (j in 0 until VERTIVAL_SIZE) {
+                // draw rectangle shape to canvas
+                val leftUP = left + (size) * j + gap // 100 210 320
+                val top2 = top + (size) * i + gap //
+                val right = leftUP + size
+                val bottom = top2 + size
+
+                val bt = Button(context)
+                bt.x = leftUP.toFloat()
+                bt.y = top2.toFloat()
+                bt.layoutParams = LinearLayout.LayoutParams(size, size)
+                cl.addView(bt)
+            }
+        }
         return root
     }
 
@@ -95,7 +134,7 @@ class FirstFragment : Fragment() {
                     bottom
                 )
                 shapeDrawable.getPaint().setColor(Color.parseColor("#009944"))
-                shapeDrawable.draw(canvas)
+//                shapeDrawable.draw(canvas)
             }
         }
 
