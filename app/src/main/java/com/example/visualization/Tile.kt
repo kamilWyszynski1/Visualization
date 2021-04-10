@@ -44,6 +44,7 @@ class Tile(
         println("clicked: $xIndex:$yIndex, x: $x, y: $y, with: ${Settings.PICK_STATE}")
         tileState = if (tileState == TileState.OPEN) TileState.BLOCKED else TileState.OPEN
 
+        // TODO do not allow changing start/stop to wall e.g.
         when (Settings.PICK_STATE) {
             PickState.START -> {
                 if (Settings.PICKED_START != null) {
