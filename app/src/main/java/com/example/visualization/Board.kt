@@ -62,23 +62,3 @@ class Board(context: Context?, attrs: AttributeSet?) : ViewGroup(context, attrs)
     }
 }
 
-class Tile(context: Context?, x: Int, y: Int) : View(context) {
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        setBackgroundColor(Color.GREEN)
-        return super.onTouchEvent(event)
-    }
-
-    @SuppressLint("DrawAllocation")
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-        val paint: Paint = Paint()
-        paint.color = Color.GRAY
-        canvas?.drawRect(
-            0f,
-            0f,
-            0f,
-            0f,
-            paint
-        )
-    }
-}
