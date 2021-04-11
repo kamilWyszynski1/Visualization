@@ -1,6 +1,5 @@
 package com.example.visualization
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -13,10 +12,6 @@ import com.example.visualization.settings.Settings
 import com.example.visualization.states.PickState
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
 
 class MainActivity : AppCompatActivity() {
 

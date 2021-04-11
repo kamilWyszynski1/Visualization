@@ -18,10 +18,10 @@ import kotlin.math.min
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class FirstFragment : Fragment() {
-    private val VERTICAL_GAP = 100
-    private val HORIZONTAL_GAP = 200
-    private val HORIZONTAL_SIZE = 15
-    private val VERTIVAL_SIZE = 8
+    private val VERTICAL_GAP = 10
+    private val HORIZONTAL_GAP = 10
+    private val HORIZONTAL_SIZE = 17
+    private val VERTIVAL_SIZE = 10
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +41,7 @@ class FirstFragment : Fragment() {
 
         val left = VERTICAL_GAP
         val top = 0
-        val gap = 1
+        val gap = 0
         val size = min(
             (height - 2 * HORIZONTAL_GAP - HORIZONTAL_SIZE * gap) / HORIZONTAL_SIZE,
             (width - 2 * VERTICAL_GAP - VERTIVAL_SIZE * gap) / VERTIVAL_SIZE

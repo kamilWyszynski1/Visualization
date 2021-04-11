@@ -7,11 +7,15 @@ import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.drawable.shapes.Shape
 import android.os.Build
+import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.solver.widgets.Rectangle
 import com.example.visualization.astart.Node
 import com.example.visualization.settings.Settings
 import com.example.visualization.states.PickState
@@ -29,6 +33,7 @@ class Tile(
 ) :
     androidx.appcompat.widget.AppCompatButton(context),
     Node {
+
 
     var tileState: TileState = TileState.OPEN
         set(value) {
@@ -56,8 +61,8 @@ class Tile(
         tileState = TileState.OPEN
         layoutParams = LinearLayout.LayoutParams(size, LinearLayout.LayoutParams.WRAP_CONTENT)
         setPadding(0, 0, 0, 0)
-        colorWithAnimation(Color.GRAY)
 
+        colorWithAnimation(Color.GRAY)
         setOnClickListener { customListener() }
     }
 
