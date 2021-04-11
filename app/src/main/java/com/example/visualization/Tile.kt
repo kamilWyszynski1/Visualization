@@ -3,19 +3,19 @@ package com.example.visualization
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
-import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.drawable.shapes.Shape
+import android.graphics.Paint
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
-import androidx.constraintlayout.solver.widgets.Rectangle
 import com.example.visualization.astart.Node
 import com.example.visualization.settings.Settings
 import com.example.visualization.states.PickState
@@ -31,9 +31,8 @@ class Tile(
     override val yIndex: Int,
     override var neighbors: MutableList<Node>?
 ) :
-    androidx.appcompat.widget.AppCompatButton(context),
+    View(context),
     Node {
-
 
     var tileState: TileState = TileState.OPEN
         set(value) {
@@ -43,7 +42,25 @@ class Tile(
     // staticNeighbors contains initialized neighbors
     // Tile calculates its neighbors once in a while so we need to keep
     // track of real, initialized ones
-    val staticNeighbors = neighbors
+    private val staticNeighbors = neighbors
+
+    private fun initPant(): Paint {
+        val p = Paint()
+        p.color = Settings.COLOR_DEFAULT
+        return p
+    }
+
+    private val paint: Paint = initPant()
+
+    init {
+        tileState = TileState.OPEN
+
+        setOnClickListener { customListener() }
+        layoutParams = ViewGroup.LayoutParams(size, size)
+        x = xVal
+        y = yVal
+        setBackgroundColor(Color.RED)
+    }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun recalculateNeighbors() {
@@ -54,18 +71,6 @@ class Tile(
         return "$xIndex:$yIndex"
     }
 
-    init {
-        x = xVal
-        y = yVal
-
-        tileState = TileState.OPEN
-        layoutParams = LinearLayout.LayoutParams(size, LinearLayout.LayoutParams.WRAP_CONTENT)
-        setPadding(0, 0, 0, 0)
-
-        colorWithAnimation(Color.GRAY)
-        setOnClickListener { customListener() }
-    }
-
     fun reset() {
         colorWithAnimation(Color.GRAY)
         tileState = TileState.OPEN
@@ -73,6 +78,9 @@ class Tile(
     }
 
     private fun customListener() {
+        println("clicked: $xIndex:$yIndex")
+        colorWithAnimation(Color.GREEN)
+
         when (Settings.PICK_STATE) {
             PickState.START -> {
                 if (Settings.PICKED_START != null) {
@@ -102,15 +110,15 @@ class Tile(
 
     @SuppressLint("ObjectAnimatorBinding")
     fun colorWithAnimation(color: Int) {
-        val from: Int = backgroundTintList?.defaultColor.hashCode()
+        val from: Int = (background as ColorDrawable).color
 
         val animator = ObjectAnimator.ofInt(
             this,
-            "backgroundTint",
+            "background",
             from,
             color
         )
-        animator.duration = 2000L
+        animator.duration = 1000L
         animator.setEvaluator(ArgbEvaluator())
         animator.interpolator = DecelerateInterpolator(2F)
         animator.addUpdateListener { animation ->

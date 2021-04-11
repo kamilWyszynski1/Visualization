@@ -11,3 +11,6 @@ val INDICES = arrayOf(
     arrayOf(0, -1),
     arrayOf(0, 1)
 )
+
+// FULL_SCREEN indicates that tiles should be placed on etire screen, requires size
+val FULL_SCREEN = -1

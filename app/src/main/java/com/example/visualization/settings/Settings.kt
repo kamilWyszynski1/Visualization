@@ -11,6 +11,7 @@ object Settings {
     var PICKED_START: Tile? = null
     var PICKED_STOP: Tile? = null
 
+    val COLOR_DEFAULT = Color.GREEN
     val COLOR_START = Color.GREEN
     val COLOR_STOP = Color.RED
 

@@ -7,12 +7,4 @@
         android:id="@+id/cl"
         tools:context=".FirstFragment">
 
-    <ImageView
-            android:id="@+id/imageV"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    <com.example.visualization.Board
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
