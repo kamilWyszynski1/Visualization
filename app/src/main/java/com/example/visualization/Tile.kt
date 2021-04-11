@@ -1,26 +1,49 @@
 package com.example.visualization
 
 
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator.AnimatorUpdateListener
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
+import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
-import androidx.appcompat.widget.AppCompatButton
+import androidx.annotation.RequiresApi
+import com.example.visualization.astart.Node
+import com.example.visualization.settings.Settings
 import com.example.visualization.states.PickState
 import com.example.visualization.states.TileState
-import java.lang.Exception
+
 
 class Tile(
     context: Context,
     xVal: Float,
     yVal: Float,
     size: Int,
-    private val xIndex: Int,
-    private val yIndex: Int
+    override val xIndex: Int,
+    override val yIndex: Int,
+    override var neighbors: MutableList<Node>?
 ) :
-    androidx.appcompat.widget.AppCompatButton(context) {
+    androidx.appcompat.widget.AppCompatButton(context),
+    Node {
 
     var tileState: TileState = TileState.OPEN
+        set(value) {
+            field = value
+        }
+
+    // staticNeighbors contains initialized neighbors
+    // Tile calculates its neighbors once in a while so we need to keep
+    // track of real, initialized ones
+    val staticNeighbors = neighbors
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun recalculateNeighbors() {
+        neighbors?.removeIf { t -> (t as Tile).tileState == TileState.BLOCKED }
+    }
 
     override fun toString(): String {
         return "$xIndex:$yIndex"
@@ -29,29 +52,29 @@ class Tile(
     init {
         x = xVal
         y = yVal
+
+        tileState = TileState.OPEN
         layoutParams = LinearLayout.LayoutParams(size, LinearLayout.LayoutParams.WRAP_CONTENT)
         setPadding(0, 0, 0, 0)
-        backgroundTintList = ColorStateList.valueOf(Color.GRAY)
+        colorWithAnimation(Color.GRAY)
 
         setOnClickListener { customListener() }
     }
 
-    private fun reset() {
-        backgroundTintList = ColorStateList.valueOf(Color.GRAY)
+    fun reset() {
+        colorWithAnimation(Color.GRAY)
+        tileState = TileState.OPEN
+        neighbors = staticNeighbors
     }
 
     private fun customListener() {
-        println("clicked: $xIndex:$yIndex, x: $x, y: $y, with: ${Settings.PICK_STATE}")
-        tileState = if (tileState == TileState.OPEN) TileState.BLOCKED else TileState.OPEN
-
-        // TODO do not allow changing start/stop to wall e.g.
         when (Settings.PICK_STATE) {
             PickState.START -> {
                 if (Settings.PICKED_START != null) {
                     Settings.PICKED_START?.reset()
                 }
                 Settings.PICKED_START = this
-                backgroundTintList = ColorStateList.valueOf(Settings.COLOR_START)
+                colorWithAnimation(Settings.COLOR_START)
                 tileState = TileState.START
             }
             PickState.STOP -> {
@@ -59,17 +82,37 @@ class Tile(
                     Settings.PICKED_STOP?.reset()
                 }
                 Settings.PICKED_STOP = this
-                backgroundTintList = ColorStateList.valueOf(Settings.COLOR_STOP)\
+                colorWithAnimation(Settings.COLOR_STOP)
                 tileState = TileState.STOP
             }
             PickState.WALL -> {
-                when (tileState) {
-                    TileState.BLOCKED -> backgroundTintList = ColorStateList.valueOf(Color.DKGRAY)
-                    TileState.OPEN -> backgroundTintList = ColorStateList.valueOf(Color.GRAY)
-                    else -> {
-                    }
-                }
+                val color = if (tileState == TileState.BLOCKED) Color.GRAY else Color.DKGRAY
+                tileState =
+                    if (tileState == TileState.BLOCKED) TileState.OPEN else TileState.BLOCKED
+
+                colorWithAnimation(color)
             }
         }
+    }
+
+    @SuppressLint("ObjectAnimatorBinding")
+    fun colorWithAnimation(color: Int) {
+        val from: Int = backgroundTintList?.defaultColor.hashCode()
+
+        val animator = ObjectAnimator.ofInt(
+            this,
+            "backgroundTint",
+            from,
+            color
+        )
+        animator.duration = 2000L
+        animator.setEvaluator(ArgbEvaluator())
+        animator.interpolator = DecelerateInterpolator(2F)
+        animator.addUpdateListener { animation ->
+            val animatedValue = animation.animatedValue as Int
+            this.backgroundTintList = ColorStateList.valueOf(animatedValue)
+        }
+        animator.start()
+
     }
 }

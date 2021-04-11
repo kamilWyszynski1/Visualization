@@ -9,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import com.example.visualization.const.INDICES
+import com.example.visualization.settings.Settings
+import java.lang.Exception
 import kotlin.math.min
 
 /**
@@ -49,16 +52,48 @@ class FirstFragment : Fragment() {
         val paint = Paint()
         paint.color = Color.RED
 
+        // INITIALIZE TILES
+        val tiles = mutableListOf<List<Tile>>()
         for (i in 0 until HORIZONTAL_SIZE) {
+            val row = mutableListOf<Tile>()
             for (j in 0 until VERTIVAL_SIZE) {
                 // draw rectangle shape to canvas
                 val leftUP = left + (size) * j + gap // 100 210 320
                 val top2 = top + (size) * i + gap //
 
-                val bt = Tile(requireContext(), leftUP.toFloat(), top2.toFloat(), size, i, j)
+                val bt = Tile(
+                    requireContext(),
+                    leftUP.toFloat(),
+                    top2.toFloat(),
+                    size,
+                    i,
+                    j,
+                    mutableListOf()
+                )
+                row.add(bt)
                 cl.addView(bt)
             }
+            tiles.add(row)
         }
+
+        // INITIALIZE TILES' NEIGHBORS
+        for (i in 0 until HORIZONTAL_SIZE) {
+            for (j in 0 until VERTIVAL_SIZE) {
+                INDICES.forEach { pair ->
+                    run {
+                        try {
+                            tiles[i][j].neighbors?.add(
+                                tiles.getOrNull(i + pair[0])?.getOrNull(j + pair[1])!!
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                }
+            }
+        }
+
+        Settings.TILES = tiles
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

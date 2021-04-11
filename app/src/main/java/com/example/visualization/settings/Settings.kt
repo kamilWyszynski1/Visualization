@@ -1,6 +1,7 @@
-package com.example.visualization
+package com.example.visualization.settings
 
 import android.graphics.Color
+import com.example.visualization.Tile
 import com.example.visualization.states.PickState
 
 object Settings {
@@ -13,7 +14,5 @@ object Settings {
     val COLOR_START = Color.GREEN
     val COLOR_STOP = Color.RED
 
-    fun elo() {
-
-    }
+    var TILES: List<List<Tile>>? = null
 }

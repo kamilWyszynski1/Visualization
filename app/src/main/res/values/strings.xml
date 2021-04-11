@@ -13,4 +13,5 @@
     <string name="start">Pick Start Tile</string>
     <string name="stop">Pick Stop Tile</string>
     <string name="wall">Pick Walls Tiles</string>
+    <string name="reset">Reset Selected Tiles</string>
 </resources>
