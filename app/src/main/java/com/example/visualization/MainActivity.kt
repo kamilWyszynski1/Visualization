@@ -1,17 +1,26 @@
 package com.example.visualization
 
 import android.graphics.Color
+import android.graphics.Paint
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.visualization.astart.Node
 import com.example.visualization.astart.defaultAStart
 import com.example.visualization.settings.Settings
 import com.example.visualization.states.PickState
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,13 +36,24 @@ class MainActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
             } else {
 
-                Settings.TILES?.forEach { it -> it.forEach { it.recalculateNeighbors() } }
+                GlobalScope.launch {
+                    Settings.TILES?.forEach { it -> it.forEach { it.recalculateNeighbors() } }
 
-                val result = defaultAStart(Settings.PICKED_START!!, Settings.PICKED_STOP!!)
-                println("result: $result")
-                result.drop(1).dropLast(1).forEach {
-                    Settings.TILES!![it.xIndex][it.yIndex].colorWithAnimation(Color.MAGENTA)
+                    val result = defaultAStart(Settings.PICKED_START!!, Settings.PICKED_STOP!!)
+                    println("result: $result")
+                    for ((it, v) in result.cameFrom!!) {
+                        if (!it.equals(Settings.PICKED_START!!) && !it.equals(Settings.PICKED_STOP!!)) {
+                            Settings.TILES!![it.xIndex][it.yIndex].setBackgroundColor(Settings.COLOR_CALCULATED)
+                            delay(100L)
+                        }
+                    }
+
+                    result.result?.drop(1)?.dropLast(1)?.forEach {
+                        Settings.TILES!![it.xIndex][it.yIndex].setBackgroundColor(Settings.COLOR_PATH)
+                    }
                 }
+
+
             }
         }
     }
@@ -61,5 +81,6 @@ class MainActivity : AppCompatActivity() {
     // resetTiles invoke reset method on every Tile
     fun resetTiles() {
         Settings.TILES?.forEach { it -> it.forEach { it.reset() } }
+
     }
 }

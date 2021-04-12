@@ -32,6 +32,7 @@ fun euclidean(n1: Node, n2: Node): Double =
 fun manhattan(n1: Node, n2: Node): Double =
     (kotlin.math.abs(n1.xIndex - n2.xIndex) + kotlin.math.abs(n1.yIndex - n2.yIndex)).toDouble()
 
+data class AStarResult(val result: List<Node>?, val cameFrom: Map<Node, Node>?)
 
 // h is heuristic function. h(n) estimates the cost to reach goal from node n
 @RequiresApi(Build.VERSION_CODES.N)
@@ -40,7 +41,7 @@ fun aStar(
     goal: Node,
     h: (Node) -> Double,
     d: (Node, Node) -> Double
-): List<Node> {
+): AStarResult {
 
     val INFINITY = 100000.0
     // The set of discovered nodes that may need to be (re-)expanded.
@@ -58,26 +59,25 @@ fun aStar(
     val fScore = mutableMapOf(start to h(start))
 
     while (openSet.isNotEmpty()) {
-        val current = openSet.minWith(Comparator.comparingDouble { h(start) })
+        val current = openSet.minWith(Comparator.comparingDouble { fScore[it]!! })
 
-//        println("\u001B[31m current: $current \u001B[0m")
         if (current == goal) {
-            return reconstructPath(
-                cameFrom,
-                current
+            return AStarResult(
+                reconstructPath(
+                    cameFrom,
+                    current
+                ), cameFrom
             )
         }
         openSet.remove(current)
 
         current?.neighbors?.forEach { neighbor ->
             run {
-                val tenatativeGScore =
+                val tentativeGScore =
                     gScore.getOrDefault(current, INFINITY).plus(d(current, neighbor))
-//                println("$neighbor with tenatativeScore $tenatativeGScore vs ${gScore.getOrDefault(neighbor, INFINITY)} d: ${h(current)}")
-                if (tenatativeGScore < gScore.getOrDefault(neighbor, INFINITY)) {
+                if (tentativeGScore < gScore.getOrDefault(neighbor, INFINITY)) {
                     cameFrom[neighbor] = current
-//                        gScore[neighbor] = tenatativeGScore
-                    gScore[neighbor] = tenatativeGScore
+                    gScore[neighbor] = tentativeGScore
                     fScore[neighbor] = gScore.getOrDefault(neighbor, INFINITY).plus(h(neighbor))
 
                     if (neighbor !in openSet) {
@@ -87,18 +87,18 @@ fun aStar(
             }
         }
     }
-    return emptyList()
+    return AStarResult(null, null)
 }
 
 @RequiresApi(Build.VERSION_CODES.N)
 fun defaultAStart(
     start: Node,
     goal: Node
-): List<Node> {
+): AStarResult {
     return aStar(
         start,
         goal,
-        h = fun(n1: Node): Double = manhattan(n1, goal),
-        d = ::manhattan
+        h = fun(n1: Node): Double = euclidean(n1, goal),
+        d = ::euclidean
     )
 }

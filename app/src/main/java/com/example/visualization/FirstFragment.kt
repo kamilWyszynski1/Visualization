@@ -53,14 +53,16 @@ class FirstFragment : Fragment() {
     private fun generateGrid(cl: ConstraintLayout) {
         // INITIALIZE TILES
         val tiles = mutableListOf<List<Tile>>()
+        var horizontalAmount = HORIZONTAL_SIZE
+        var verticalAmount = VERTIVAL_SIZE
 
         if (HORIZONTAL_GAP == FULL_SCREEN || VERTIVAL_SIZE == FULL_SCREEN) {
-            val horizontal_amount = (fragmentHeight - 2 * HORIZONTAL_GAP) / (SIZE + GAP)
-            val vertical_amount = (fragmentWidth - 2 * VERTICAL_GAP) / (SIZE + GAP)
+            horizontalAmount = (fragmentHeight - 2 * HORIZONTAL_GAP) / (SIZE + GAP)
+            verticalAmount = (fragmentWidth - 2 * VERTICAL_GAP) / (SIZE + GAP)
 
-            for (i in 0 until horizontal_amount) {
+            for (i in 0 until horizontalAmount) {
                 val row = mutableListOf<Tile>()
-                for (j in 0 until vertical_amount) {
+                for (j in 0 until verticalAmount) {
                     // draw rectangle shape to canvas
                     val leftUP = HORIZONTAL_GAP + (SIZE + GAP) * j  // 100 210 320
                     val top2 = VERTICAL_GAP + (SIZE + GAP) * i
@@ -100,8 +102,6 @@ class FirstFragment : Fragment() {
                     // draw rectangle shape to canvas
                     val leftUP = left + (size + GAP) * j  // 100 210 320
                     val top2 = top + (size + GAP) * i
-                    val right = leftUP + size
-                    val bottom = top2 + size
 
                     val bt = Tile(
                         requireContext(),
@@ -117,30 +117,30 @@ class FirstFragment : Fragment() {
                 }
                 tiles.add(row)
             }
-            // INITIALIZE TILES' NEIGHBORS
-            for (i in 0 until HORIZONTAL_SIZE) {
-                for (j in 0 until VERTIVAL_SIZE) {
-                    INDICES.forEach { pair ->
-                        run {
-                            try {
-                                tiles[i][j].neighbors?.add(
-                                    tiles.getOrNull(i + pair[0])?.getOrNull(j + pair[1])!!
-                                )
-                            } catch (e: Exception) {
-                                null
-                            }
+        }
+        // INITIALIZE TILES' NEIGHBORS
+        for (i in 0 until horizontalAmount) {
+            for (j in 0 until verticalAmount) {
+                INDICES.forEach { pair ->
+                    run {
+                        try {
+                            tiles[i][j].neighbors?.add(
+                                tiles.getOrNull(i + pair[0])?.getOrNull(j + pair[1])!!
+                            )
+                        } catch (e: Exception) {
+                            null
                         }
                     }
                 }
             }
         }
         Settings.TILES = tiles
+        Settings.TILES!![0][0].setStart()
+        Settings.TILES!![9][9].setStop()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         super.onCreate(savedInstanceState)
-
-
     }
 }
